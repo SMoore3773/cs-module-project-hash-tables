@@ -26,13 +26,13 @@ class LinkedList:
         curr = self.head
         prev = None
         # if value to delete is head
-        if curr.value == value:
+        if curr.key == value:
             self.head = curr.next
             curr.next = None
             return curr
 
         while curr != None:
-            if curr.value == value:
+            if curr.key == value:
                 prev.next = curr.next
                 curr.next = None
                 return curr
@@ -48,17 +48,17 @@ class LinkedList:
 
     # overwright node or insert node at the head
     def insert_at_head_or_overwrite(self, node):
-        existingNode = self.find(node.value)  # O(n)
+        existingNode = self.find(node.value)
         if existingNode != None:
             existingNode.value = node.value
         else:
             self.insert_at_head(node)
 
 
+# counter to determine load factor, will be incremented for puts, and decremented for deletes
+
 # instance of linked list to access ll methods for collision resolution
 ll = LinkedList()
-# counter to determine load factor, will be incremented for puts, and decremented for deletes
-entries = 0
 
 
 class HashTableEntry:
@@ -82,12 +82,13 @@ class HashTable:
 
     Implement this.
     """
-
+    
     def __init__(self, capacity):
         # Your code here
         # intitailize table
         self.table = [None] * capacity
         self.capacity = capacity
+        self.entries = 0
 
     def get_num_slots(self):
         """
@@ -109,7 +110,7 @@ class HashTable:
         Implement this.
         """
         # LF = number of items in hash table devided by the number of spaces in the table
-        return (entries / capacity)
+        return (self.entries / self.capacity)
 
     def fnv1(self, key):
         """
@@ -148,12 +149,12 @@ class HashTable:
 
         Implement this.
         """
-
+        self.table[self.hash_index(key)] = value
         # points to the location of the table assigned to the hashed key, then creates an instance of a linked list at that location
-        self.table[self.hash_index(key)] = ll.insert_at_head_or_overwrite(value)
+        # self.table[self.hash_index(key)] = ll.insert_at_head_or_overwrite(HashTableEntry(key, value))
 
         # increment the number of entries to keep track of load factor
-        entries += 1
+        # entries += 1
 
     def delete(self, key):
         """
@@ -168,10 +169,12 @@ class HashTable:
 
         if value == None:
             print('value is None')
-
         self.table[self.hash_index(key)] = None
+        # self.table[self.hash_index(key)] = ll.delete(key)
 
-        entries -= 1
+        # entries -= 1
+        # run resize if load factor is too small after deletion
+        # self.resize()
 
     def get(self, key):
         """
@@ -182,7 +185,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        value = self.table
         return self.table[self.hash_index(key)]
 
     def resize(self, new_capacity):
@@ -192,7 +195,16 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # check load factor to determine if new capacity is going to be larger or smaller
+        lf = self.get_load_factor()
+        if lf > 0.7:
+            pass
+            # new capacity will be double current capacity
+        if lf < 0.3:
+            pass
+            # new capacity will be half current capacity
+        else:
+            pass
 
 
 if __name__ == "__main__":
