@@ -1,3 +1,66 @@
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def __repr__(self):
+        currStr = ''
+        curr = self.head
+        while curr != None:
+            currStr += f'{str(curr.value)} ->'
+            curr = curr.next
+        return currStr
+
+    def find(self, value):
+        # return node with value
+        curr = self.head
+
+        while curr != None:
+            if curr.value == value:
+                return curr
+            curr = curr.next
+        return None
+
+    # delete node with given value
+    # O(n)
+    def delete(self, value):
+        curr = self.head
+        prev = None
+        # if value to delete is head
+        if curr.value == value:
+            self.head = curr.next
+            curr.next = None
+            return curr
+
+        while curr != None:
+            if curr.value == value:
+                prev.next = curr.next
+                curr.next = None
+                return curr
+            else:
+                prev = curr
+                curr = curr.next
+
+        return None
+
+    def insert_at_head(self, node):
+        node.next = self.head
+        self.head = node
+
+    # overwright node or insert node at the head
+    def insert_at_head_or_overwrite(self, node):
+        existingNode = self.find(node.value)  # O(n)
+        if existingNode != None:
+            existingNode.value = node.value
+        else:
+            self.insert_at_head(node)
+
+
+# instance of linked list to access ll methods for collision resolution
+ll = LinkedList()
+# counter to determine load factor, will be incremented for puts, and decremented for deletes
+entries = 0
+
+
 class HashTableEntry:
     """
     Linked List hash table key/value pair
@@ -22,9 +85,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
-        pass
-
+        # intitailize table
+        self.table = [None] * capacity
+        self.capacity = capacity
 
     def get_num_slots(self):
         """
@@ -36,8 +99,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        # return the total length of the table
+        return len(self.table)
 
     def get_load_factor(self):
         """
@@ -45,8 +108,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        # LF = number of items in hash table devided by the number of spaces in the table
+        return (entries / capacity)
 
     def fnv1(self, key):
         """
@@ -57,22 +120,24 @@ class HashTable:
 
         # Your code here
 
-
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
-
+        hash = 5381
+        for x in key:
+            hash = ((hash << 5) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # returns the hash of the key of the object to be stored
+
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -83,8 +148,12 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
 
+        # points to the location of the table assigned to the hashed key, then creates an instance of a linked list at that location
+        self.table[self.hash_index(key)] = ll.insert_at_head_or_overwrite(value)
+
+        # increment the number of entries to keep track of load factor
+        entries += 1
 
     def delete(self, key):
         """
@@ -95,7 +164,14 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        value = self.table[self.hash_index(key)]
 
+        if value == None:
+            print('value is None')
+
+        self.table[self.hash_index(key)] = None
+
+        entries -= 1
 
     def get(self, key):
         """
@@ -107,6 +183,7 @@ class HashTable:
         """
         # Your code here
 
+        return self.table[self.hash_index(key)]
 
     def resize(self, new_capacity):
         """
@@ -116,7 +193,6 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
 
 
 if __name__ == "__main__":
